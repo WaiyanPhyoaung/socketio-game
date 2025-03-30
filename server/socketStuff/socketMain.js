@@ -1,1 +1,1 @@
-export { io as default } from "../server";
+export { io as default } from "../../server";

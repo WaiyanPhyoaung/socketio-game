@@ -1,5 +1,5 @@
 import httpServer from "./server/expressStuff/expressMain";
-import io from "./server/socketStuff/socketMain";
+import "./server/socketStuff/socketMain";
 
 try {
   httpServer.listen(8000);

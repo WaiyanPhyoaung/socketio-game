@@ -14,13 +14,21 @@ function draw() {
   const camY = -player.locY + canvas.height / 2;
   context.translate(camX, camY);
 
-  context.beginPath();
-  context.fillStyle = "rgba(255,0,0)";
-  context.arc(player.locX, player.locY, 10, 0, Math.PI * 2);
-  context.fill();
-  context.lineWidth = 3;
-  context.strokeStyle = "rgba(0,255,0)";
-  context.stroke();
+  players.forEach((p) => {
+    context.beginPath();
+    context.fillStyle = p.playerData.color;
+    context.arc(
+      p.playerData.locX,
+      p.playerData.locY,
+      p.playerData.radius,
+      0,
+      Math.PI * 2
+    );
+    context.fill();
+    context.lineWidth = 3;
+    context.strokeStyle = "rgba(0,255,0)";
+    context.stroke();
+  });
 
   orbs.forEach((orb) => {
     context.beginPath();

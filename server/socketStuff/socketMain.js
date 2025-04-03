@@ -9,6 +9,7 @@ import { disconnect } from "process";
 
 const orbs = [];
 let players = [];
+let player = {};
 let tickInterval;
 const intervalDuration = 1000;
 
@@ -37,19 +38,39 @@ io.on("connect", (socket) => {
     socket.join("game");
     const playerData = new PlayerData(clientPlayer.name, gameSettings);
     const playerCofig = new PlayerConfig(gameSettings);
-    const player = new Player(socket.id, playerData, playerCofig);
+    player = new Player(socket.id, playerData, playerCofig);
     players.push(player);
     ackCb(orbs);
+  });
+  socket.on("disconnect", () => {
+    console.log(socket.id, " is disconnected");
 
-    socket.on("disconnect", () => {
-      console.log(socket.id, " is disconnected");
+    players = players.filter((player) => player.socketId !== socket.id);
 
-      players = players.filter((player) => player.socketId !== socket.id);
+    if (!players.length) {
+      clearInterval(tickInterval);
+    }
+  });
+  socket.on("tock", ({ xVector, yVector }) => {
+    console.log(xVector, yVector);
 
-      if (!players.length) {
-        clearInterval(tickInterval);
-      }
-    });
+    speed = 10;
+    xV = player.playerConfig.xVector = xVector;
+    yV = player.playerConfig.yVector = yVector;
+    if (
+      (player.playerData.locX < 5 && xV < 0) ||
+      (player.playerData.locX > 500 && xV > 0)
+    ) {
+      player.playerData.locY -= speed * yV;
+    } else if (
+      (player.playerData.locY < 5 && yV > 0) ||
+      (player.playerData.locY > 500 && yV < 0)
+    ) {
+      player.playerData.locX += speed * xV;
+    } else {
+      player.playerData.locX += speed * xV;
+      player.playerData.locY -= speed * yV;
+    }
   });
 });
 

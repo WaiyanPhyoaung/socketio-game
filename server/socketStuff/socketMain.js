@@ -1,14 +1,13 @@
-import { log } from "console";
 import { io } from "../../server";
 
 import Orb from "./classes/Orb";
 import PlayerConfig from "./classes/PlayerConfig";
 import PlayerData from "./classes/PlayerData";
 import Player from "./classes/Plyer";
-import { disconnect } from "process";
 
 const orbs = [];
 let players = [];
+let playersForClient = [];
 let player = {};
 let tickInterval;
 const intervalDuration = 1000;
@@ -37,10 +36,11 @@ io.on("connect", (socket) => {
     }
     socket.join("game");
     const playerData = new PlayerData(clientPlayer.name, gameSettings);
-    const playerCofig = new PlayerConfig(gameSettings);
-    player = new Player(socket.id, playerData, playerCofig);
+    const playerConfig = new PlayerConfig(gameSettings);
+    player = new Player(socket.id, playerData, playerConfig);
     players.push(player);
-    ackCb(orbs);
+    playersForClient.push({ playerData });
+    ackCb({ orbs, currentPlayerIndex: playersForClient.length - 1 });
   });
   socket.on("disconnect", () => {
     console.log(socket.id, " is disconnected");
@@ -52,9 +52,9 @@ io.on("connect", (socket) => {
     }
   });
   socket.on("tock", ({ xVector, yVector }) => {
-    console.log(xVector, yVector);
+    if (!player.config) return;
 
-    speed = 10;
+    const speed = player.playerConfig.speed;
     xV = player.playerConfig.xVector = xVector;
     yV = player.playerConfig.yVector = yVector;
     if (
